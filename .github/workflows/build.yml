@@ -51,6 +51,32 @@ jobs:
         working-directory: frontend
         run: npx cap sync android
 
+      - name: Setup Keystore (if secrets are configured)
+        if: ${{ secrets.ANDROID_KEYSTORE }}
+        working-directory: frontend/android
+        run: |
+          # Create keystore from secrets for production signing
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > lextro-release.keystore
+          echo "storeFile=lextro-release.keystore" > keystore.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> keystore.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> keystore.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
+          echo "✅ Release keystore configured"
+
+      - name: Build info
+        working-directory: frontend/android
+        run: |
+          if [ -f "keystore.properties" ]; then
+            echo "✅ Building with production signing"
+          else
+            echo "⚠️  Building with debug signing (no keystore secrets configured)"
+            echo "   To use production signing, add these secrets to the repository:"
+            echo "   - ANDROID_KEYSTORE (base64-encoded keystore file)"
+            echo "   - ANDROID_KEYSTORE_PASSWORD"
+            echo "   - ANDROID_KEY_ALIAS"
+            echo "   - ANDROID_KEY_PASSWORD"
+          fi
+
       - name: Build Android app
         working-directory: frontend/android
         run: |

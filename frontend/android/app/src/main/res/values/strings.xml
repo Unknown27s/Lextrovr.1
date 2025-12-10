@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Author Vocabulary Companion</string>
-    <string name="title_activity_main">Author Vocabulary Companion</string>
+    <string name="app_name">Lextro</string>
+    <string name="title_activity_main">Lextro</string>
     <string name="package_name">com.authorcompanion.app</string>
     <string name="custom_url_scheme">com.authorcompanion.app</string>
 </resources>
