@@ -52,7 +52,7 @@ jobs:
         run: npx cap sync android
 
       - name: Setup Keystore (if secrets are configured)
-        if: ${{ secrets.ANDROID_KEYSTORE != '' }}
+        if: ${{ secrets.ANDROID_KEYSTORE }}
         working-directory: frontend/android
         run: |
           # Create keystore from secrets for production signing

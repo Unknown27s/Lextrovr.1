@@ -27,10 +27,12 @@ android {
         }
         release {
             // Load keystore properties from keystore.properties file if it exists
-            def keystorePropertiesFile = rootProject.file("keystore.properties")
+            // Look in the android directory (parent of app directory)
+            def keystorePropertiesFile = rootProject.file('keystore.properties')
             if (keystorePropertiesFile.exists()) {
                 def keystoreProperties = new Properties()
                 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+                // Resolve storeFile relative to the android directory
                 storeFile rootProject.file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']
