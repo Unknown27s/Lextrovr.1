@@ -135,7 +135,9 @@ jobs:
         working-directory: frontend
         run: |
           npm install -g @capacitor/cli
-          npx cap add android
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
 
       - name: Sync Capacitor
         working-directory: frontend
