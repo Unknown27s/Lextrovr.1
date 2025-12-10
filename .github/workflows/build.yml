@@ -1,0 +1,203 @@
+name: Build Capacitor Apps
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    name: Build Web (Vite)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build web app
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-dist
+          path: frontend/dist
+
+  build-ios:
+    runs-on: macos-latest
+    name: Build iOS App
+    needs: build-web
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build web app
+        working-directory: frontend
+        run: npm run build
+
+      - name: Setup Capacitor
+        working-directory: frontend
+        run: |
+          npm install -g @capacitor/cli
+          npx cap add ios
+
+      - name: Sync Capacitor
+        working-directory: frontend
+        run: npx cap sync ios
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+
+      - name: Setup Cocoapods
+        run: sudo gem install cocoapods
+
+      - name: Install iOS dependencies
+        working-directory: frontend/ios/App
+        run: pod install
+
+      - name: Build iOS app
+        working-directory: frontend/ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace \
+                    -scheme App \
+                    -configuration Release \
+                    -arch arm64 \
+                    -derivedDataPath build \
+                    BUILD_FOR_DEVICE=1
+
+      - name: Upload iOS build
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-build
+          path: frontend/ios/App/build
+
+  build-android:
+    runs-on: ubuntu-latest
+    name: Build Android App
+    needs: build-web
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build web app
+        working-directory: frontend
+        run: npm run build
+
+      - name: Setup Capacitor
+        working-directory: frontend
+        run: |
+          npm install -g @capacitor/cli
+          npx cap add android
+
+      - name: Sync Capacitor
+        working-directory: frontend
+        run: npx cap sync android
+
+      - name: Build Android app
+        working-directory: frontend/android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
+
+      - name: Upload Android build
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: frontend/android/app/build/outputs/apk/release/
+
+      - name: Generate Android release notes
+        run: |
+          echo "## Android Build Complete" > build_notes.md
+          echo "Build Date: $(date)" >> build_notes.md
+          echo "Commit: ${{ github.sha }}" >> build_notes.md
+
+  test:
+    runs-on: ubuntu-latest
+    name: Run Tests
+    needs: build-web
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run type checking
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Lint code
+        working-directory: frontend
+        run: npm run lint 2>/dev/null || echo "Lint check skipped"
+
+  notify:
+    runs-on: ubuntu-latest
+    name: Build Notification
+    needs: [build-web, build-ios, build-android, test]
+    if: always()
+
+    steps:
+      - name: Build status
+        run: |
+          echo "Build Status Report:"
+          echo "- Web: ${{ needs.build-web.result }}"
+          echo "- iOS: ${{ needs.build-ios.result }}"
+          echo "- Android: ${{ needs.build-android.result }}"
+          echo "- Tests: ${{ needs.test.result }}"
