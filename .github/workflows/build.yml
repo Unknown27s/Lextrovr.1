@@ -32,7 +32,7 @@ jobs:
     - name: Setup Java JDK
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: '17'
         distribution: 'temurin'
         
     - name: Setup Android SDK
@@ -58,6 +58,10 @@ jobs:
     - name: Sync Capacitor
       working-directory: frontend
       run: npx cap sync android
+      
+    - name: Fix Java compatibility
+      working-directory: frontend/android/app
+      run: sed -i 's/VERSION_21/VERSION_17/g' capacitor.build.gradle
       
     - name: Build Android APK
       working-directory: frontend/android
