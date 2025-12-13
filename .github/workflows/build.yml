@@ -2,99 +2,72 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
-    name: Build Android APK
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('frontend/android/**/build.gradle', 'frontend/android/**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-
-      - name: Install dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Build web app
-        working-directory: frontend
-        run: npm run build
-
-      - name: Setup Capacitor
-        working-directory: frontend
-        run: |
-          npm install -g @capacitor/cli
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
-
-      - name: Sync Capacitor
-        working-directory: frontend
-        run: npx cap sync android
-
-      - name: Setup Keystore (if secrets are configured)
-        if: ${{ secrets.ANDROID_KEYSTORE != '' }}
-        working-directory: frontend/android
-        run: |
-          # Create keystore from secrets for production signing
-          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > lextro-release.keystore
-          echo "storeFile=lextro-release.keystore" > keystore.properties
-          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> keystore.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> keystore.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
-          echo "✅ Release keystore configured"
-
-      - name: Build info
-        working-directory: frontend/android
-        run: |
-          if [ -f "keystore.properties" ]; then
-            echo "✅ Building with production signing"
-          else
-            echo "⚠️  Building with debug signing (no keystore secrets configured)"
-            echo "   To use production signing, add these secrets to the repository:"
-            echo "   - ANDROID_KEYSTORE (base64-encoded keystore file)"
-            echo "   - ANDROID_KEYSTORE_PASSWORD"
-            echo "   - ANDROID_KEY_ALIAS"
-            echo "   - ANDROID_KEY_PASSWORD"
-          fi
-
-      - name: Build Android app
-        working-directory: frontend/android
-        run: |
-          chmod +x ./gradlew
-          ./gradlew --parallel --stacktrace assembleRelease
-
-      - name: Upload Android build
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk
-          path: frontend/android/app/build/outputs/apk/release/*.apk
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      working-directory: frontend
+      run: npm ci
+      
+    - name: Build web app
+      working-directory: frontend
+      run: npm run build
+      
+    - name: Setup Java JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+      
+    - name: Verify Android Platform
+      working-directory: frontend
+      run: |
+        echo "Checking Android platform..."
+        ls -la
+        if [ -d "./android" ]; then
+          echo "✅ Android platform exists"
+          ls -la android/
+        else
+          echo "❌ Android platform missing - this should not happen"
+          exit 1
+        fi
+        
+    - name: Sync Capacitor
+      working-directory: frontend
+      run: npx cap sync android
+      
+    - name: Build Android APK
+      working-directory: frontend/android
+      run: |
+        echo "Entering android directory..."
+        echo "Contents of android directory:"
+        ls -la
+        echo "Making gradlew executable..."
+        chmod +x gradlew
+        echo "Building APK..."
+        ./gradlew assembleDebug
+        
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: daily-quote-debug.apk
+        path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
