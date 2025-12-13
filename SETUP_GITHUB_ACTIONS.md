@@ -33,11 +33,43 @@ cd ..
 
 ## GitHub Actions Setup
 
-### 1. Secrets Configuration
-Add these secrets to your GitHub repository:
+### 1. Secrets Configuration (Optional for Production Signing)
+
+⚠️ **Note:** GitHub Actions will work without these secrets! If secrets are not configured, the build will use debug signing automatically. Add these secrets only when you need production-signed APKs.
+
+Add these secrets to your GitHub repository for production signing:
 
 **Settings → Secrets and variables → Actions → New repository secret**
 
+#### Android Signing Secrets (Optional)
+```
+Name: ANDROID_KEYSTORE
+Value: base64-encoded-keystore-file
+Description: Your release keystore file encoded in base64
+
+Name: ANDROID_KEYSTORE_PASSWORD
+Value: your-keystore-password
+Description: Password for the keystore file
+
+Name: ANDROID_KEY_ALIAS
+Value: your-key-alias
+Description: Key alias in the keystore (e.g., "lextro-key")
+
+Name: ANDROID_KEY_PASSWORD
+Value: your-key-password
+Description: Password for the specific key
+```
+
+**How to encode your keystore:**
+```bash
+# macOS/Linux
+base64 -i lextro-release.keystore | tr -d '\n'
+
+# Windows PowerShell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("lextro-release.keystore"))
+```
+
+#### iOS Signing Secrets (Optional - Only if building for iOS)
 ```
 Name: APPLE_ID
 Value: your-apple-id@example.com
@@ -47,19 +79,18 @@ Value: your-app-specific-password
 
 Name: MATCH_PASSWORD
 Value: your-match-password
-
-Name: ANDROID_KEYSTORE
-Value: base64-encoded-keystore-file
-
-Name: ANDROID_KEYSTORE_PASS
-Value: your-keystore-password
-
-Name: ANDROID_KEY_ALIAS
-Value: your-key-alias
-
-Name: ANDROID_KEY_PASS
-Value: your-key-password
 ```
+
+### 1a. What happens without secrets?
+
+If you **don't configure** the signing secrets:
+- ✅ Builds will still work
+- ✅ APKs will be signed with debug keystore
+- ✅ APKs can be installed on any device
+- ⚠️  APKs cannot be published to Google Play Store
+- ⚠️  Will show as "debug" version
+
+This is **perfect for testing and development**!
 
 ### 2. Enable GitHub Actions
 - Go to **Settings → Actions → General**
