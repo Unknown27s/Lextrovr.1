@@ -38,6 +38,10 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
       
+    - name: Setup Capacitor
+      working-directory: frontend
+      run: npm install -g @capacitor/cli
+      
     - name: Verify Android Platform
       working-directory: frontend
       run: |
