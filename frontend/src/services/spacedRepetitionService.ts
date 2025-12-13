@@ -94,7 +94,7 @@ export const spacedRepetitionService = {
         const now = Date.now();
 
         // Filter due items
-        let dueItems = queue.filter((item) => item.nextReview <= now);
+        const dueItems = queue.filter((item) => item.nextReview <= now);
 
         // Sort by nextReview (oldest first - high priority)
         dueItems.sort((a, b) => a.nextReview - b.nextReview);

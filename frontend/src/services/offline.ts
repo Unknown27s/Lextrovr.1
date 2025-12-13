@@ -58,25 +58,25 @@ class OfflineService {
             maxAttempts: 3,
         };
 
-        await this.db?.add('syncQueue', item);
+        await this.db?.syncQueue.add(item);
     }
 
     async getQueue(): Promise<SyncQueueItem[]> {
         if (!this.db) await this.init();
-        return (await this.db?.getAll('syncQueue')) || [];
+        return (await this.db?.syncQueue.toArray()) || [];
     }
 
     async removeFromQueue(id: string): Promise<void> {
         if (!this.db) await this.init();
-        await this.db?.delete('syncQueue', id);
+        await this.db?.syncQueue.delete(id);
     }
 
     async updateQueueItem(id: string, updates: Partial<SyncQueueItem>): Promise<void> {
         if (!this.db) await this.init();
 
-        const item = await this.db?.get('syncQueue', id);
+        const item = await this.db?.syncQueue.get(id);
         if (item) {
-            await this.db?.put('syncQueue', { ...item, ...updates });
+            await this.db?.syncQueue.put({ ...item, ...updates });
         }
     }
 
@@ -91,14 +91,14 @@ class OfflineService {
             expiresAt: Date.now() + ttlSeconds * 1000,
         };
 
-        await this.db?.put('vocabCache', cached);
+        await this.db?.vocabCache.put(cached);
     }
 
     async getCachedVocabFeed(cursor?: string): Promise<CachedVocabFeed | undefined> {
         if (!this.db) await this.init();
 
         const key = cursor || 'initial';
-        const cached = await this.db?.get('vocabCache', key);
+        const cached = await this.db?.vocabCache.get(key);
 
         if (cached && cached.expiresAt > Date.now()) {
             return cached;
@@ -110,13 +110,13 @@ class OfflineService {
     async clearExpiredCache(): Promise<void> {
         if (!this.db) await this.init();
 
-        const allCached = await this.db?.getAll('vocabCache');
+        const allCached = await this.db?.vocabCache.toArray();
         const now = Date.now();
 
         if (allCached) {
             for (const item of allCached) {
                 if (item.expiresAt < now) {
-                    await this.db?.delete('vocabCache', item.cursor);
+                    await this.db?.vocabCache.delete(item.cursor);
                 }
             }
         }
@@ -125,19 +125,19 @@ class OfflineService {
     // User vocab local
     async saveUserVocabLocal(userVocab: any): Promise<void> {
         if (!this.db) await this.init();
-        await this.db?.put('userVocabLocal', userVocab);
+        await this.db?.userVocabLocal.put(userVocab);
     }
 
     async getUserVocabLocal(): Promise<any[]> {
         if (!this.db) await this.init();
-        return (await this.db?.getAll('userVocabLocal')) || [];
+        return (await this.db?.userVocabLocal.toArray()) || [];
     }
 
     async clearDatabase(): Promise<void> {
         if (!this.db) await this.init();
-        await this.db?.clear('syncQueue');
-        await this.db?.clear('vocabCache');
-        await this.db?.clear('userVocabLocal');
+        await this.db?.syncQueue.clear();
+        await this.db?.vocabCache.clear();
+        await this.db?.userVocabLocal.clear();
     }
 }
 

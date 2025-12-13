@@ -42,7 +42,7 @@ const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, vocabId, onClose,
                 const type = types[Math.floor(Math.random() * types.length)];
                 setExerciseType(type);
 
-                let exercise: any = {
+                const exercise: any = {
                     type,
                     word,
                     definition,

@@ -151,6 +151,7 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({ mode, onComplete, on
                 totalQuestions: sessionResults.length + 1,
                 correctAnswers: sessionResults.filter((r) => r.quality >= 3).length + (isCorrect ? 1 : 0),
                 results: [...sessionResults, result],
+                duration: Date.now() - startTime,
             };
             spacedRepetitionService.saveReviewSession(session);
             onComplete(session);
@@ -195,6 +196,7 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({ mode, onComplete, on
                 totalQuestions: sessionResults.length + 1,
                 correctAnswers: sessionResults.filter((r) => r.quality >= 3).length,
                 results: [...sessionResults, result],
+                duration: Date.now() - startTime,
             };
             spacedRepetitionService.saveReviewSession(session);
             onComplete(session);

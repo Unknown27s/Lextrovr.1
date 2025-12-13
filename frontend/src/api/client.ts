@@ -25,7 +25,7 @@ const loadApiFormatDictionary = async (): Promise<{ words: any[], index: Record<
         dictionaryIndex = data.index;
 
         console.log(`✅ Loaded indexed dictionary with ${data.totalWords} words`);
-        return { words: apiFormatDictionary, index: dictionaryIndex };
+        return { words: apiFormatDictionary!, index: dictionaryIndex! };
     } catch (error) {
         console.error('Failed to load API format dictionary:', error);
         return null;

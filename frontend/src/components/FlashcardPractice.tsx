@@ -239,8 +239,8 @@ export const FlashcardPractice: React.FC<FlashcardPracticeProps> = ({
                     <button
                         onClick={() => setCurrentMode('flip')}
                         className={`px-4 py-2 rounded-lg font-medium transition-all ${currentMode === 'flip'
-                                ? 'bg-accent-teal text-white'
-                                : 'bg-warm-gray text-text-secondary'
+                            ? 'bg-accent-teal text-white'
+                            : 'bg-warm-gray text-text-secondary'
                             }`}
                     >
                         Flip Mode
@@ -248,8 +248,8 @@ export const FlashcardPractice: React.FC<FlashcardPracticeProps> = ({
                     <button
                         onClick={() => setCurrentMode('guess')}
                         className={`px-4 py-2 rounded-lg font-medium transition-all ${currentMode === 'guess'
-                                ? 'bg-accent-teal text-white'
-                                : 'bg-warm-gray text-text-secondary'
+                            ? 'bg-accent-teal text-white'
+                            : 'bg-warm-gray text-text-secondary'
                             }`}
                     >
                         Guess Mode
@@ -264,8 +264,8 @@ export const FlashcardPractice: React.FC<FlashcardPracticeProps> = ({
                             <div
                                 onClick={handleFlip}
                                 className={`min-h-64 rounded-xl p-8 cursor-pointer transition-all transform flex items-center justify-center ${isFlipped
-                                        ? 'bg-gradient-to-br from-blue-50 to-blue-100'
-                                        : 'bg-gradient-to-br from-accent-teal to-accent-teal-dark'
+                                    ? 'bg-gradient-to-br from-blue-50 to-blue-100'
+                                    : 'bg-gradient-to-br from-accent-teal to-accent-teal-dark'
                                     }`}
                             >
                                 <div className="text-center">
@@ -394,7 +394,7 @@ export const FlashcardPractice: React.FC<FlashcardPracticeProps> = ({
                     </button>
 
                     <button
-                        onClick={handleSpeak}
+                        onClick={() => handleSpeak(cards[currentIndex]?.word || '')}
                         className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200"
                     >
                         <Volume2 size={20} />
