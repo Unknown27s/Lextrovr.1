@@ -28,14 +28,15 @@ android {
         abortOnError = false
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 }
 
 repositories {
     google()
     mavenCentral()
+    // flatDir is required for Cordova plugins that don't have Maven metadata
     flatDir{
         dirs 'src/main/libs', 'libs'
     }
