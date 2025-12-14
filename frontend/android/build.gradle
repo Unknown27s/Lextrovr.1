@@ -27,3 +27,20 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+import com.android.build.gradle.BaseExtension
+
+subprojects { subproject ->
+    subproject.plugins.withId('com.android.application') {
+        subproject.extensions.configure(BaseExtension) { extension ->
+            extension.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+            extension.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+        }
+    }
+    subproject.plugins.withId('com.android.library') {
+        subproject.extensions.configure(BaseExtension) { extension ->
+            extension.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+            extension.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+        }
+    }
+}
