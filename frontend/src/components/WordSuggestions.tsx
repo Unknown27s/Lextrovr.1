@@ -80,15 +80,6 @@ export default function WordSuggestions({ onWordSelect }: WordSuggestionsProps) 
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [savedWords, setSavedWords] = useState<string[]>([]);
 
-    useEffect(() => {
-        loadSavedWords();
-        initializeFilteredWords();
-    }, [loadSavedWords, initializeFilteredWords]);
-
-    useEffect(() => {
-        filterWords(searchTerm);
-    }, [searchTerm, savedWords, filterWords]);
-
     const loadSavedWords = useCallback(() => {
         const saved = localStorageApi.getUserVocab();
         const wordList = saved.map((sv: any) => sv.vocab_item.word.toLowerCase());
@@ -113,7 +104,7 @@ export default function WordSuggestions({ onWordSelect }: WordSuggestionsProps) 
         setFilteredWords(shuffled.slice(0, 15));
     }, [savedWords]);
 
-    const filterWords = useCallback((term: string) => {
+    const filterWords = useCallback(async (term: string) => {
         if (!term.trim()) {
             initializeFilteredWords();
             return;
@@ -132,37 +123,71 @@ export default function WordSuggestions({ onWordSelect }: WordSuggestionsProps) 
                 });
             });
         } else {
-            // Search by keyword in category names
+            // If no category match, search word names
             Object.entries(WORD_CATEGORIES).forEach(([category, words]) => {
-                if (category.includes(searchLower)) {
-                    words.forEach(word => {
+                words.forEach(word => {
+                    if (word.toLowerCase().includes(searchLower)) {
                         results.push({
                             word,
                             category,
                             isSaved: savedWords.includes(word.toLowerCase())
                         });
-                    });
-                }
-            });
-
-            // If no category match, search word names
-            if (results.length === 0) {
-                Object.entries(WORD_CATEGORIES).forEach(([category, words]) => {
-                    words.forEach(word => {
-                        if (word.includes(searchLower)) {
-                            results.push({
-                                word,
-                                category,
-                                isSaved: savedWords.includes(word.toLowerCase())
-                            });
-                        }
-                    });
+                    }
                 });
-            }
+            });
         }
 
-        setFilteredWords(results.length > 0 ? results : []);
-    }, [savedWords, initializeFilteredWords]);
+        setFilteredWords(results.slice(0, 15));
+
+        // If we have an exact match, load its details
+        const exactMatch = results.find(r => r.word.toLowerCase() === searchLower);
+        if (exactMatch) {
+            const word = {
+                ...exactMatch,
+                ...wordDetails[exactMatch.word],
+                isSaved: savedWords.includes(exactMatch.word.toLowerCase())
+            };
+            setSelectedWord(word);
+            return;
+        }
+
+        setDetailsLoading(true);
+        try {
+            const data = await dictionaryApi.getWord(searchLower);
+            const details = dictionaryApi.transformToVocabItem(data, searchLower);
+
+            setWordDetails(prev => ({
+                ...prev,
+                [searchLower]: details
+            }));
+
+            setSelectedWord({
+                word: searchLower,
+                category: 'unknown',
+                definition: details.definition,
+                isSaved: savedWords.includes(searchLower)
+            });
+        } catch (error) {
+            console.error('Failed to load word details:', error);
+            setSelectedWord({
+                word: searchLower,
+                category: 'unknown',
+                definition: 'Definition not available',
+                isSaved: savedWords.includes(searchLower)
+            });
+        } finally {
+            setDetailsLoading(false);
+        }
+    }, [savedWords, wordDetails]);
+
+    useEffect(() => {
+        loadSavedWords();
+        initializeFilteredWords();
+    }, []);
+
+    useEffect(() => {
+        filterWords(searchTerm);
+    }, [searchTerm, savedWords, filterWords]);
 
     const loadWordDetails = async (word: WordDetail) => {
         if (wordDetails[word.word]) {

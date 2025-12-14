@@ -8,6 +8,7 @@ interface VocabCardProps {
     onUseInDocument: (id: string) => void;
     source?: 'offline' | 'cache' | 'online';
     isSaved?: boolean;
+    isLoading?: boolean;
 }
 
 const VocabCard: React.FC<VocabCardProps> = ({
@@ -17,6 +18,7 @@ const VocabCard: React.FC<VocabCardProps> = ({
     onUseInDocument,
     source,
     isSaved = false,
+    isLoading = false,
 }) => {
     const [expanded, setExpanded] = useState(false);
     const [saved, setSaved] = useState(isSaved);

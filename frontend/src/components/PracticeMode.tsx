@@ -17,6 +17,10 @@ export const PracticeMode: React.FC<PracticeModeProps> = ({ mode, onComplete, on
     const [sessionResults, setSessionResults] = useState<ReviewResult[]>([]);
     const [isCompleted, setIsCompleted] = useState(false);
     const [loading] = useState(false);
+    const [attempts, setAttempts] = useState(0);
+    const [itemStartTime, setItemStartTime] = useState(Date.now());
+    const [startTime] = useState(Date.now());
+    const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | null; message: string; hints: string[] }>({ type: null, message: '', hints: [] });
 
     if (loading) {
         return (

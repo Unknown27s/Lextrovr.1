@@ -20,12 +20,6 @@ const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, vocabId, onClose,
     const [isCorrect, setIsCorrect] = useState(false);
     const [exerciseType, setExerciseType] = useState<ExerciseType>('choose_synonym');
 
-    useEffect(() => {
-        if (isOpen && vocabId) {
-            loadExercise();
-        }
-    }, [isOpen, vocabId, loadExercise]);
-
     const loadExercise = useCallback(async () => {
         setLoading(true);
         try {
@@ -78,6 +72,12 @@ const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, vocabId, onClose,
             setLoading(false);
         }
     }, [vocabId]);
+
+    useEffect(() => {
+        if (isOpen && vocabId) {
+            loadExercise();
+        }
+    }, [isOpen, vocabId, loadExercise]);
 
     const checkAnswer = () => {
         let correct = false;

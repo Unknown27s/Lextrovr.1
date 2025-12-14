@@ -91,7 +91,7 @@ export const exerciseGenerator = {
             // 4. Generate hints
             const missing_words = await Promise.all(
                 missingWords.map((mw, idx) =>
-                    exerciseGenerator.generateHint(mw.word, idx + 1).then(hint => ({
+                    exerciseGenerator.generateHint(mw.word).then(hint => ({
                         blank_number: idx + 1,
                         word: mw.word,
                         hint,
@@ -106,7 +106,7 @@ export const exerciseGenerator = {
                 paragraph_original,
                 paragraph_with_blanks,
                 missing_words,
-                topic: exerciseGenerator.getTopic(paragraph_original),
+                topic: exerciseGenerator.getTopic(),
                 created_at: new Date().toISOString()
             };
         } catch (error) {
