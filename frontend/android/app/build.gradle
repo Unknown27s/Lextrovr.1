@@ -74,13 +74,23 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
 }
 
-apply from: 'capacitor.build.gradle'
-
 // Override Capacitor's Java 21 settings to use Java 17 for compatibility
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+apply from: 'capacitor.build.gradle'
+
+// Force Java 17 after all configurations are applied
+afterEvaluate {
+    android {
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_17
+            targetCompatibility JavaVersion.VERSION_17
+        }
     }
 }
 
