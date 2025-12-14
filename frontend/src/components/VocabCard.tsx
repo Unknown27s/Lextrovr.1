@@ -6,7 +6,6 @@ interface VocabCardProps {
     onSave: (id: string) => void;
     onPractice: (id: string) => void;
     onUseInDocument: (id: string) => void;
-    isLoading?: boolean;
     source?: 'offline' | 'cache' | 'online';
     isSaved?: boolean;
 }
@@ -16,7 +15,6 @@ const VocabCard: React.FC<VocabCardProps> = ({
     onSave,
     onPractice,
     onUseInDocument,
-    isLoading = false,
     source,
     isSaved = false,
 }) => {

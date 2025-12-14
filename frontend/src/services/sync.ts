@@ -72,7 +72,7 @@ class SyncService {
                 localStorageApi.saveVocab(item.data.vocab_item_id, item.data.vocab_item, item.data.status);
                 break;
 
-            case 'update_status':
+            case 'update_status': {
                 // Update status in localStorage
                 const userVocab = localStorageApi.getUserVocab();
                 const vocabItem = userVocab.find((uv: any) => uv.id === item.data.user_vocab_id);
@@ -81,6 +81,7 @@ class SyncService {
                     localStorage.setItem('userVocab', JSON.stringify(userVocab));
                 }
                 break;
+            }
 
             case 'remove_vocab':
                 localStorageApi.removeVocab(item.data.user_vocab_id);

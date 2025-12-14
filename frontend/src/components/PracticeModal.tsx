@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { localStorageApi, VocabItem, dictionaryApi } from '../api/client';
+import React, { useState, useEffect, useCallback } from 'react';
+import { localStorageApi } from '../api/client';
 import { Check, X, Volume2 } from 'lucide-react';
 
 interface PracticeModalProps {
@@ -24,9 +24,9 @@ const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, vocabId, onClose,
         if (isOpen && vocabId) {
             loadExercise();
         }
-    }, [isOpen, vocabId]);
+    }, [isOpen, vocabId, loadExercise]);
 
-    const loadExercise = async () => {
+    const loadExercise = useCallback(async () => {
         setLoading(true);
         try {
             const userVocab = localStorageApi.getUserVocab();
@@ -77,7 +77,7 @@ const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, vocabId, onClose,
         } finally {
             setLoading(false);
         }
-    };
+    }, [vocabId]);
 
     const checkAnswer = () => {
         let correct = false;
@@ -190,8 +190,8 @@ const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, vocabId, onClose,
                                     <label
                                         key={option}
                                         className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedOption === option
-                                                ? 'border-accent-teal bg-accent-teal/5'
-                                                : 'border-warm-gray hover:border-accent-teal hover:bg-warm-white'
+                                            ? 'border-accent-teal bg-accent-teal/5'
+                                            : 'border-warm-gray hover:border-accent-teal hover:bg-warm-white'
                                             }`}
                                     >
                                         <input

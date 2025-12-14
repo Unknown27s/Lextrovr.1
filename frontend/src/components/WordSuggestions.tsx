@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { dictionaryApi, localStorageApi } from '../api/client';
 
 interface WordSuggestionsProps {
@@ -77,26 +77,25 @@ export default function WordSuggestions({ onWordSelect }: WordSuggestionsProps) 
     const [filteredWords, setFilteredWords] = useState<WordDetail[]>([]);
     const [selectedWord, setSelectedWord] = useState<WordDetail | null>(null);
     const [wordDetails, setWordDetails] = useState<{ [key: string]: any }>({});
-    const [loading, setLoading] = useState(false);
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [savedWords, setSavedWords] = useState<string[]>([]);
 
     useEffect(() => {
         loadSavedWords();
         initializeFilteredWords();
-    }, []);
+    }, [loadSavedWords, initializeFilteredWords]);
 
     useEffect(() => {
         filterWords(searchTerm);
-    }, [searchTerm, savedWords]);
+    }, [searchTerm, savedWords, filterWords]);
 
-    const loadSavedWords = () => {
+    const loadSavedWords = useCallback(() => {
         const saved = localStorageApi.getUserVocab();
         const wordList = saved.map((sv: any) => sv.vocab_item.word.toLowerCase());
         setSavedWords(wordList);
-    };
+    }, []);
 
-    const initializeFilteredWords = () => {
+    const initializeFilteredWords = useCallback(() => {
         // Show a mix of words from all categories initially
         const allWords: WordDetail[] = [];
         Object.entries(WORD_CATEGORIES).forEach(([category, words]) => {
@@ -112,9 +111,9 @@ export default function WordSuggestions({ onWordSelect }: WordSuggestionsProps) 
         // Shuffle and show first 15
         const shuffled = allWords.sort(() => 0.5 - Math.random());
         setFilteredWords(shuffled.slice(0, 15));
-    };
+    }, [savedWords]);
 
-    const filterWords = (term: string) => {
+    const filterWords = useCallback((term: string) => {
         if (!term.trim()) {
             initializeFilteredWords();
             return;
@@ -163,7 +162,7 @@ export default function WordSuggestions({ onWordSelect }: WordSuggestionsProps) 
         }
 
         setFilteredWords(results.length > 0 ? results : []);
-    };
+    }, [savedWords, initializeFilteredWords]);
 
     const loadWordDetails = async (word: WordDetail) => {
         if (wordDetails[word.word]) {
@@ -264,8 +263,8 @@ export default function WordSuggestions({ onWordSelect }: WordSuggestionsProps) 
                                     key={word.word}
                                     onClick={() => loadWordDetails(word)}
                                     className={`w-full text-left p-4 rounded-lg border-2 transition-all ${selectedWord?.word === word.word
-                                            ? 'border-accent-teal bg-accent-teal/5'
-                                            : 'border-warm-gray hover:border-accent-teal/50 bg-white'
+                                        ? 'border-accent-teal bg-accent-teal/5'
+                                        : 'border-warm-gray hover:border-accent-teal/50 bg-white'
                                         } ${word.isSaved ? 'bg-warm-cream/50' : ''}`}
                                 >
                                     <div className="flex items-start justify-between gap-3">
@@ -376,8 +375,8 @@ export default function WordSuggestions({ onWordSelect }: WordSuggestionsProps) 
                                             onClick={() => handleAddWord(selectedWord)}
                                             disabled={selectedWord.isSaved}
                                             className={`w-full py-2 rounded-lg font-medium text-sm transition-all mt-4 ${selectedWord.isSaved
-                                                    ? 'bg-warm-gray text-text-muted cursor-default'
-                                                    : 'bg-accent-teal text-white hover:bg-accent-teal-dark'
+                                                ? 'bg-warm-gray text-text-muted cursor-default'
+                                                : 'bg-accent-teal text-white hover:bg-accent-teal-dark'
                                                 }`}
                                         >
                                             {selectedWord.isSaved ? '✓ Added to Vocabulary' : '+ Add to Vocabulary'}

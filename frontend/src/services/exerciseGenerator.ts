@@ -77,7 +77,6 @@ export const exerciseGenerator = {
             const paragraph_original = paragraphs[Math.floor(Math.random() * paragraphs.length)];
 
             // 2. Extract important words
-            const words = paragraph_original.split(/\s+/);
             const importantWordData = await exerciseGenerator.extractImportantWords(
                 paragraph_original,
                 difficulty
@@ -129,7 +128,7 @@ export const exerciseGenerator = {
 
         // Find words matching criteria
         for (let i = 0; i < words.length; i++) {
-            const cleanWord = words[i].replace(/[.,!?;:—\-]/g, '').toLowerCase();
+            const cleanWord = words[i].replace(/[.,!?;:—-]/g, '').toLowerCase();
 
             if (
                 cleanWord.length >= config.minLength &&
@@ -138,7 +137,7 @@ export const exerciseGenerator = {
                 !['the', 'and', 'but', 'this', 'that', 'with', 'from', 'have', 'been', 'were', 'was'].includes(cleanWord)
             ) {
                 importantWords.push({
-                    word: words[i].replace(/[.,!?;:—\-]/g, ''),
+                    word: words[i].replace(/[.,!?;:—-]/g, ''),
                     position: i
                 });
             }
@@ -167,11 +166,11 @@ export const exerciseGenerator = {
 
         words = words.map((word, idx) => {
             if (positionsToReplace.has(idx)) {
-                const cleanWord = word.replace(/[.,!?;:—\-]/g, '');
+                const cleanWord = word.replace(/[.,!?;:—-]/g, '');
                 missingWords.push({ word: cleanWord, position: idx });
 
                 // Preserve punctuation
-                const punctuation = word.match(/[.,!?;:—\-]+$/)?.[0] || '';
+                const punctuation = word.match(/[.,!?;:—-]+$/)?.[0] || '';
                 return `____${punctuation}`;
             }
             return word;
@@ -184,7 +183,7 @@ export const exerciseGenerator = {
     },
 
     // Generate hint using Datamuse and Dictionary APIs
-    generateHint: async (word: string, blankNumber: number): Promise<string> => {
+    generateHint: async (word: string): Promise<string> => {
         try {
             // Try Dictionary API first for definition
             const dictResponse = await axios.get(`${DICTIONARY_API}/${word}`, {
@@ -213,7 +212,7 @@ export const exerciseGenerator = {
     },
 
     // Extract topic from paragraph
-    getTopic: (paragraph: string): string => {
+    getTopic: (): string => {
         const topics = ['Story', 'Science', 'History', 'Nature', 'Culture', 'Technology', 'Daily Life', 'Adventure'];
         return topics[Math.floor(Math.random() * topics.length)];
     },

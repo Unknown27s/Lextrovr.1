@@ -41,22 +41,6 @@ export default function WritingPractice({ onClose, difficulty = 'medium' }: Writ
         }));
     };
 
-    const handleCheckAnswer = (blankNumber: number) => {
-        if (!exercise) return;
-
-        const missingWord = exercise.missing_words.find(mw => mw.blank_number === blankNumber);
-        if (!missingWord) return;
-
-        const userAnswer = userAnswers[blankNumber] || '';
-        const isCorrect = exerciseGenerator.validateAnswer(userAnswer, missingWord.word);
-        const message = exerciseGenerator.getFeedback(userAnswer, missingWord.word, isCorrect);
-
-        setFeedback(prev => ({
-            ...prev,
-            [blankNumber]: { isCorrect, message }
-        }));
-    };
-
     const handleSubmitAll = () => {
         if (!exercise) return;
 

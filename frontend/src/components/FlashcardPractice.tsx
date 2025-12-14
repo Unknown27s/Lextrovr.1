@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCw, Volume2, Check, X } from 'lucide-react';
-import { dictionaryApi, localStorageApi } from '../api/client';
+import { ChevronLeft, ChevronRight, Volume2, Check, X } from 'lucide-react';
+import { localStorageApi } from '../api/client';
 
 interface FlashcardPracticeProps {
     isOpen: boolean;

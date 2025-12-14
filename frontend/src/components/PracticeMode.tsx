@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronRight, SkipForward, RotateCcw } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronRight, SkipForward } from 'lucide-react';
 import { spacedRepetitionService, StudyItem, ReviewSession, ReviewResult } from '../services/spacedRepetitionService';
 
 interface PracticeModeProps {
@@ -9,33 +9,14 @@ interface PracticeModeProps {
 }
 
 export const PracticeMode: React.FC<PracticeModeProps> = ({ mode, onComplete, onClose }) => {
-    const [studyQueue, setStudyQueue] = useState<StudyItem[]>([]);
+    const [studyQueue] = useState<StudyItem[]>(() => spacedRepetitionService.getStudyQueue(mode));
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userAnswer, setUserAnswer] = useState('');
-    const [feedback, setFeedback] = useState<{
-        type: 'correct' | 'incorrect' | 'partial' | null;
-        message: string;
-        hints: string[];
-    }>({
-        type: null,
-        message: '',
-        hints: [],
-    });
     const [showHints, setShowHints] = useState(false);
     const [hintLevel, setHintLevel] = useState(0);
     const [sessionResults, setSessionResults] = useState<ReviewResult[]>([]);
     const [isCompleted, setIsCompleted] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [startTime, setStartTime] = useState(Date.now());
-    const [itemStartTime, setItemStartTime] = useState(Date.now());
-    const [attempts, setAttempts] = useState(0);
-
-    // Load study queue
-    useEffect(() => {
-        const queue = spacedRepetitionService.getStudyQueue(mode);
-        setStudyQueue(queue);
-        setLoading(false);
-    }, [mode]);
+    const [loading] = useState(false);
 
     if (loading) {
         return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { authService } from '../services/authService';
 import { localStorageApi } from '../api/client';
 
@@ -8,16 +8,10 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-    const [wordStyle, setWordStyle] = useState<'serif' | 'sans-serif'>('serif');
-    const [username, setUsername] = useState('');
-
-    useEffect(() => {
-        const savedStyle = localStorage.getItem('wordStyle') as 'serif' | 'sans-serif' || 'serif';
-        const user = authService.getCurrentUser();
-
-        setWordStyle(savedStyle);
-        setUsername(user?.name || '');
-    }, [isOpen]);
+    const [wordStyle, setWordStyle] = useState<'serif' | 'sans-serif'>(() =>
+        localStorage.getItem('wordStyle') as 'serif' | 'sans-serif' || 'serif'
+    );
+    const username = authService.getCurrentUser()?.name || '';
 
     const handleWordStyleChange = (newStyle: 'serif' | 'sans-serif') => {
         setWordStyle(newStyle);

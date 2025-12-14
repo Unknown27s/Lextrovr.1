@@ -12,7 +12,7 @@ interface WordSearchProps {
 
 const CATEGORIES = ['emotion', 'expression', 'movement', 'action', 'place', 'quality', 'other'] as const;
 
-export default function WordSearch({ onWordAdded, onClose, isOpen = true, onPractice, onUseInDocument }: WordSearchProps): React.ReactElement {
+export default function WordSearch({ onWordAdded, onClose, onPractice, onUseInDocument }: WordSearchProps): React.ReactElement {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');

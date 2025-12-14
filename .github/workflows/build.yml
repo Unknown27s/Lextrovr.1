@@ -59,10 +59,6 @@ jobs:
       working-directory: frontend
       run: npx cap sync android
       
-    - name: Fix Java compatibility
-      working-directory: frontend/android/app
-      run: sed -i 's/VERSION_21/VERSION_17/g' capacitor.build.gradle
-      
     - name: Build Android APK
       working-directory: frontend/android
       run: |

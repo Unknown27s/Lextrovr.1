@@ -4,7 +4,6 @@ import { store } from './store';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import VocabFeed from './components/VocabFeed';
-import WordSuggestions from './components/WordSuggestions';
 import SettingsModal from './components/SettingsModal';
 import PracticeModal from './components/PracticeModal';
 import UseInDocumentOverlay from './components/UseInDocumentOverlay';

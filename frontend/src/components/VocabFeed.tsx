@@ -56,7 +56,7 @@ const VocabFeed: React.FC<VocabFeedProps> = ({ onPractice, onUseInDocument, show
         return customCategory ? customCategory.words : wordsByCategory[type] || wordsByCategory['random'];
     };
 
-    const fetchApiWords = async (type: string) => {
+    const fetchApiWords = useCallback(async (type: string) => {
         setLoadingSamples(true);
         setDisplayedWordCount(0);
         try {
@@ -70,7 +70,7 @@ const VocabFeed: React.FC<VocabFeedProps> = ({ onPractice, onUseInDocument, show
         } finally {
             setLoadingSamples(false);
         }
-    };
+    }, []);
 
     const loadMoreWords = async (words: string[], startIndex: number) => {
         const batchSize = 3;
@@ -170,7 +170,7 @@ const VocabFeed: React.FC<VocabFeedProps> = ({ onPractice, onUseInDocument, show
             }
             setIsInitialLoad(false);
         }
-    }, [isInitialLoad, loadMore, showTypeSelector]);
+    }, [isInitialLoad, loadMore, showTypeSelector, fetchApiWords]);
 
     // Infinite scroll observer for home tab
     useEffect(() => {
