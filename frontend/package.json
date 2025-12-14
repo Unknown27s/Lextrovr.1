@@ -11,7 +11,7 @@
         "lint": "eslint . --ext .ts,.tsx --fix",
         "type-check": "tsc --noEmit",
         "test": "vitest",
-        "android": "capacitor build android",
+        "android": "npm run build && npx cap sync android && echo 'Android project ready. Run npm run android:run to open in Android Studio'",
         "android:run": "capacitor open android"
     },
     "dependencies": {
